@@ -1,2 +1,2 @@
-# EntityFrameworkCore---Avan-ado
+# EntityFrameworkCore-Avançado
 Entity Framework Core Advanced :fire:
