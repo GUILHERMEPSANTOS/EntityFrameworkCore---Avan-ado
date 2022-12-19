@@ -15,11 +15,58 @@ namespace EFCoreAvancado
             // GerenciarEstadoDaConexao(gerenciarEstadoConexao: false);
             // _contador = 0;
             // GerenciarEstadoDaConexao(gerenciarEstadoConexao: true);
+            // SqlInjection();
+            MigracaoesPendentes();
         }
 
         static int _contador;
 
+        // nunca aceite concatenação sempre argumentos no metodo somente
 
+        public static void MigracaoesPendentes()
+        {
+            using var db = new ApplicationDbContext();
+
+            IEnumerable<string> migracaoesPendentes = db.Database.GetPendingMigrations();
+
+            Console.WriteLine($"Migrações = {migracaoesPendentes.Count()}");
+
+            foreach (var migracao in migracaoesPendentes)
+            {
+                Console.WriteLine($"Migracao: {migracao}");
+            }
+
+        }
+
+        public static void SqlInjection()
+        {
+            using var db = new ApplicationDbContext();
+
+            db.Database.EnsureDeleted();
+            db.Database.EnsureCreated();
+
+            db.Departamentos.AddRange(
+                new Domain.Departamento
+                {
+                    Descricao = "Departamento  2"
+                },
+                new Domain.Departamento
+                {
+                    Descricao = "Departamento 3"
+                }
+            );
+
+            db.SaveChanges();
+
+
+            var descricao = "Teste' or 1='1";                                                                         // 'Teste' or 1='1'
+            db.Database.ExecuteSqlRaw($"update Departamentos set descricao='Depaartamento Alterado' where descricao = '{descricao}'");
+
+            foreach (var departamento in db.Departamentos.AsNoTracking())
+            {
+                Console.WriteLine($"Id: {departamento.Id}, Descricao: {departamento.Descricao}");
+            }
+        }
 
         public static void ExecuteSql()
         {
