@@ -17,6 +17,7 @@ namespace EFCoreAvancado.Data.Configurations
             builder.HasKey(f => f.Id);
             builder.Property(f => f.Nome).HasMaxLength(50).IsRequired();
             builder.Property(f => f.CPF).HasColumnType("CHAR(11)").IsRequired();
+            builder.Property(f => f.RG);
 
             builder
               .HasOne(f => f.Departamento)

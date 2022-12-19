@@ -10,18 +10,63 @@ namespace EFCoreAvancado
         public static void Main()
         {
             // GapDoEnsureCreated();
-            // HealthCheckDatabase();
+            // HealthCheckDatabase()
             // _contador = 0;
             // GerenciarEstadoDaConexao(gerenciarEstadoConexao: false);
             // _contador = 0;
             // GerenciarEstadoDaConexao(gerenciarEstadoConexao: true);
             // SqlInjection();
-            MigracaoesPendentes();
+            // MigracaoesPendentes();
+            // AplicarMigracaoEmTempoExecucao();
+            // MigracoesAplicadas();
+            ScriptGeralDoBancoDeDados();
         }
-
         static int _contador;
 
-        // nunca aceite concatenação sempre argumentos no metodo somente
+        public static void ScriptGeralDoBancoDeDados()
+        {
+
+            using var db = new ApplicationDbContext();
+
+            var script = db.Database.GenerateCreateScript();
+
+            Console.WriteLine(script);
+
+        }
+        public static void MigracoesAplicadas()
+        {
+            using var db = new ApplicationDbContext();
+
+            var migracoes = db.Database.GetAppliedMigrations();
+
+            Console.WriteLine($"Migrações = {migracoes.Count()}");
+
+            foreach (var migracao in migracoes)
+            {
+                Console.WriteLine($"Migracao: {migracao}");
+            }
+        }
+
+        public static void TodasMigracoes()
+        {
+            using var db = new ApplicationDbContext();
+
+            var migracoes = db.Database.GetMigrations();
+
+            Console.WriteLine($"Migrações = {migracoes.Count()}");
+
+            foreach (var migracao in migracoes)
+            {
+                Console.WriteLine($"Migracao: {migracao}");
+            }
+        }
+
+        public static void AplicarMigracaoEmTempoExecucao()
+        {
+            using var db = new ApplicationDbContext();
+
+            db.Database.Migrate();
+        }
 
         public static void MigracaoesPendentes()
         {
@@ -38,6 +83,7 @@ namespace EFCoreAvancado
 
         }
 
+        // nunca aceite concatenação sempre argumentos no metodo somente
         public static void SqlInjection()
         {
             using var db = new ApplicationDbContext();

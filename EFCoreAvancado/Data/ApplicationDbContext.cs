@@ -18,7 +18,7 @@ namespace EFCoreAvancado.Data
 
             optionsBuilder
                 .EnableSensitiveDataLogging()
-                // .LogTo(Console.WriteLine)
+                .LogTo(Console.WriteLine)
                 .UseSqlServer(strConnection);
         }
 
