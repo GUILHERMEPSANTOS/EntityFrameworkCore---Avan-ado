@@ -12,6 +12,7 @@ namespace EFCoreAvancado.Domain
         public string CPF { get; set; }
         public string RG { get; set; }
         public int DepartamentoId { get; set; }
-        public Departamento Departamento { get; set; }       
+
+        public virtual Departamento Departamento { get; set; }
     }
 }

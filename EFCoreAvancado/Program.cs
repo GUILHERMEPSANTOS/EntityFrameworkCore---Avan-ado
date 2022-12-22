@@ -7,22 +7,198 @@ namespace EFCoreAvancado
 {
     public class Program
     {
+        public static int _contador;
         public static void Main()
         {
             // GapDoEnsureCreated();
-            // HealthCheckDatabase()
-            // _contador = 0;
-            // GerenciarEstadoDaConexao(gerenciarEstadoConexao: false);
-            // _contador = 0;
-            // GerenciarEstadoDaConexao(gerenciarEstadoConexao: true);
-            // SqlInjection();
-            // MigracaoesPendentes();
-            // AplicarMigracaoEmTempoExecucao();
-            // MigracoesAplicadas();
-            ScriptGeralDoBancoDeDados();
-        }
-        static int _contador;
 
+            // HealthCheckDatabase()
+
+            // GerenciarEstadoDaConexao(gerenciarEstadoConexao: false);
+
+            // _contador = 0;
+
+            // GerenciarEstadoDaConexao(gerenciarEstadoConexao: true);
+
+            // SqlInjection();
+
+            // MigracaoesPendentes();
+
+            // AplicarMigracaoEmTempoExecucao();
+
+            // MigracoesAplicadas();
+
+            // ScriptGeralDoBancoDeDados();
+
+            // CarregamentoAdiantado_Eager();
+
+            // CarregamentoExplicito_Explicitly();
+            _contador = 0;
+            CarregamentoLento_LazyLoad();
+            // _contador = 0;
+            // CarregamentoLento_LazyLoad(GereciarConexao: true);
+        }
+
+        public static void CarregamentoLento_LazyLoad(bool GereciarConexao = false)
+        {
+            using var db = new ApplicationDbContext();
+
+            var connection = db.Database.GetDbConnection();
+
+            SetUpTiposCarregamentos(db);
+
+            if (GereciarConexao)
+            {
+                connection.Open();
+            }
+
+            // db.ChangeTracker.LazyLoadingEnabled = false;
+
+            var dapartamentos = db
+                .Departamentos.ToList();
+
+
+            connection.StateChange += (_, __) => ++_contador;
+
+            var time = System.Diagnostics.Stopwatch.StartNew();
+
+            foreach (var departamento in dapartamentos)
+            {
+
+                Console.WriteLine($"-------------------------------------");
+                Console.WriteLine($"Departamento: {departamento.Descricao}");
+
+                if (departamento.Funcionarios?.Any() ?? false)
+                {
+                    foreach (var funcionario in departamento.Funcionarios)
+                    {
+                        Console.WriteLine($"-------------------------------------");
+                        Console.WriteLine($"Funcionario: {funcionario.Nome}");
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("Nenhum Funcionario");
+                }
+            }
+
+            time.Stop();
+
+            if (GereciarConexao)
+            {
+                Console.WriteLine("-------------------------------------");
+                Console.WriteLine($"Tempo :{time.Elapsed.ToString()}, Contador: {_contador}");
+            }
+        }
+
+        public static void CarregamentoExplicito_Explicitly()
+        {
+            using var db = new ApplicationDbContext();
+            SetUpTiposCarregamentos(db);
+
+            var dapartamentos = db
+                .Departamentos.ToList();
+
+            foreach (var departamento in dapartamentos)
+            {
+                if (departamento.Id == 2)
+                {
+                    // db.Entry(departamento).Collection(d => d.Funcionarios).Load();
+                    db.Entry(departamento)
+                         .Collection(d => d.Funcionarios)
+                         .Query()
+                         .Where(f => f.Id > 2)
+                         .ToList();
+                }
+
+                Console.WriteLine($"-------------------------------------");
+                Console.WriteLine($"Departamento: {departamento.Descricao}");
+
+                if (departamento.Funcionarios?.Any() ?? false)
+                {
+                    foreach (var funcionario in departamento.Funcionarios)
+                    {
+                        Console.WriteLine($"-------------------------------------");
+                        Console.WriteLine($"Funcionario: {funcionario.Nome}");
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("Nenhum Funcionario");
+                }
+            }
+        }
+        public static void CarregamentoAdiantado_Eager()
+        {
+            using var db = new ApplicationDbContext();
+            SetUpTiposCarregamentos(db);
+
+            var dapartamentos = db
+                .Departamentos
+                .Include(deparamento => deparamento.Funcionarios);
+
+            foreach (var departamento in dapartamentos)
+            {
+                Console.WriteLine($"-------------------------------------");
+                Console.WriteLine($"Departamento: {departamento.Descricao}");
+
+                if (departamento.Funcionarios.Any())
+                {
+                    foreach (var funcionario in departamento.Funcionarios)
+                    {
+                        Console.WriteLine($"-------------------------------------");
+                        Console.WriteLine($"Funcionario: {funcionario.Nome}");
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("Nenhum Funcionario");
+                }
+            }
+        }
+        public static void SetUpTiposCarregamentos(ApplicationDbContext db)
+        {
+            if (!db.Departamentos.Any())
+            {
+                db.Departamentos.AddRange(
+                    new Domain.Departamento()
+                    {
+                        Descricao = "Departamento 01",
+                        Funcionarios = new List<Domain.Funcionario>()
+                        {
+                            new Domain.Funcionario()
+                            {
+                                Nome = "Guilherme",
+                                RG = "99384758",
+                                CPF = "93847583902"
+                            }
+                        }
+                    },
+                    new Domain.Departamento()
+                    {
+                        Descricao = "Departamento 02",
+                        Funcionarios = new List<Domain.Funcionario>()
+                        {
+                            new Domain.Funcionario()
+                            {
+                                Nome = "Santos",
+                                RG = "90987654",
+                                CPF = "23425643421"
+                            },
+                            new Domain.Funcionario()
+                            {
+                                Nome = "Pereira",
+                                RG = "50487654",
+                                CPF = "55525643421"
+                            }
+                        }
+                    }
+                );
+
+                db.SaveChanges();
+                db.ChangeTracker.Clear();
+            }
+        }
         public static void ScriptGeralDoBancoDeDados()
         {
 
