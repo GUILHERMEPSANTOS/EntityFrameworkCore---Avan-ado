@@ -1,184 +1,171 @@
 using EFCoreAvancado.Data;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Storage;
 
-namespace EFCoreAvancado
+namespace EFCoreAvancado;
+
+public class Program
 {
-    public class Program
+
+    public static void Main()
     {
-        public static int _contador;
-        public static void Main()
+        // FiltroGlobal();
+        // IgnoreFiltroGlobal();
+        // ConsultaProjetada();
+        // ConsultaParametrizada();
+        // ConsultaInterpolada();
+        ConsultaComTag();
+    }
+
+
+    public static void ConsultaComTag()
+    {
+        using var db = new ApplicationDbContext();
+
+        SetUp();
+
+        var departamentos = db.Departamentos
+                .TagWith(@"Estou enviando um comentario
+                    /)_)/
+                ")
+                .ToList();
+
+
+        foreach (var departamento in departamentos)
         {
-            // GapDoEnsureCreated();
-
-            // HealthCheckDatabase()
-
-            // GerenciarEstadoDaConexao(gerenciarEstadoConexao: false);
-
-            // _contador = 0;
-
-            // GerenciarEstadoDaConexao(gerenciarEstadoConexao: true);
-
-            // SqlInjection();
-
-            // MigracaoesPendentes();
-
-            // AplicarMigracaoEmTempoExecucao();
-
-            // MigracoesAplicadas();
-
-            // ScriptGeralDoBancoDeDados();
-
-            // CarregamentoAdiantado_Eager();
-
-            // CarregamentoExplicito_Explicitly();
-            _contador = 0;
-            CarregamentoLento_LazyLoad();
-            // _contador = 0;
-            // CarregamentoLento_LazyLoad(GereciarConexao: true);
+            Console.WriteLine($"Departamento descrição: {departamento.Descricao}");
         }
+    }
+    public static void ConsultaInterpolada()
+    {
+        using var db = new ApplicationDbContext();
 
-        public static void CarregamentoLento_LazyLoad(bool GereciarConexao = false)
+        SetUp();
+
+        var id = 0;
+
+        var departamentos = db.Departamentos
+                .FromSqlInterpolated($"SELECT * FROM Departamentos WITH(NOLOCK) WHERE ID > {id}")
+                .Where(departamento => !departamento.Excluido)
+                .ToList();
+
+
+        foreach (var departamento in departamentos)
         {
-            using var db = new ApplicationDbContext();
-
-            var connection = db.Database.GetDbConnection();
-
-            SetUpTiposCarregamentos(db);
-
-            if (GereciarConexao)
-            {
-                connection.Open();
-            }
-
-            // db.ChangeTracker.LazyLoadingEnabled = false;
-
-            var dapartamentos = db
-                .Departamentos.ToList();
-
-
-            connection.StateChange += (_, __) => ++_contador;
-
-            var time = System.Diagnostics.Stopwatch.StartNew();
-
-            foreach (var departamento in dapartamentos)
-            {
-
-                Console.WriteLine($"-------------------------------------");
-                Console.WriteLine($"Departamento: {departamento.Descricao}");
-
-                if (departamento.Funcionarios?.Any() ?? false)
-                {
-                    foreach (var funcionario in departamento.Funcionarios)
-                    {
-                        Console.WriteLine($"-------------------------------------");
-                        Console.WriteLine($"Funcionario: {funcionario.Nome}");
-                    }
-                }
-                else
-                {
-                    Console.WriteLine("Nenhum Funcionario");
-                }
-            }
-
-            time.Stop();
-
-            if (GereciarConexao)
-            {
-                Console.WriteLine("-------------------------------------");
-                Console.WriteLine($"Tempo :{time.Elapsed.ToString()}, Contador: {_contador}");
-            }
+            Console.WriteLine($"Departamento descrição: {departamento.Descricao}");
         }
+    }
 
-        public static void CarregamentoExplicito_Explicitly()
+
+    public static void ConsultaParametrizada()
+    {
+        using var db = new ApplicationDbContext();
+
+        SetUp();
+
+        // var id = 0;
+
+        var id = new SqlParameter
         {
-            using var db = new ApplicationDbContext();
-            SetUpTiposCarregamentos(db);
+            Value = 0,
+            SqlDbType = System.Data.SqlDbType.Int
+        };
 
-            var dapartamentos = db
-                .Departamentos.ToList();
+        var departamentos = db.Departamentos
+                .FromSqlRaw("SELECT * FROM Departamentos WITH(NOLOCK) WHERE ID > {0}", id)
+                .Where(departamento => !departamento.Excluido)
+                .ToList();
 
-            foreach (var departamento in dapartamentos)
+
+        foreach (var departamento in departamentos)
+        {
+            Console.WriteLine($"Departamento descrição: {departamento.Descricao}");
+        }
+    }
+
+    public static void ConsultaProjetada()
+    {
+        using var db = new ApplicationDbContext();
+
+        SetUp();
+
+        var departamentos = db.Departamentos
+            .Where(departamento => departamento.Id > 0)
+            .Select(departamento =>
+                 new
+                 {
+                     departamento.Descricao,
+                     Funcionario = departamento.Funcionarios.Select(funcionario => funcionario.Nome)
+                 }).ToList();
+
+
+        foreach (var departamento in departamentos)
+        {
+            Console.WriteLine($"Departamento descrição: {departamento.Descricao}");
+
+            foreach (var funcionario in departamento.Funcionario)
             {
-                if (departamento.Id == 2)
-                {
-                    // db.Entry(departamento).Collection(d => d.Funcionarios).Load();
-                    db.Entry(departamento)
-                         .Collection(d => d.Funcionarios)
-                         .Query()
-                         .Where(f => f.Id > 2)
-                         .ToList();
-                }
-
-                Console.WriteLine($"-------------------------------------");
-                Console.WriteLine($"Departamento: {departamento.Descricao}");
-
-                if (departamento.Funcionarios?.Any() ?? false)
-                {
-                    foreach (var funcionario in departamento.Funcionarios)
-                    {
-                        Console.WriteLine($"-------------------------------------");
-                        Console.WriteLine($"Funcionario: {funcionario.Nome}");
-                    }
-                }
-                else
-                {
-                    Console.WriteLine("Nenhum Funcionario");
-                }
+                Console.WriteLine($"\t Funcionario Nome: {funcionario}");
             }
         }
-        public static void CarregamentoAdiantado_Eager()
+    }
+
+    public static void IgnoreFiltroGlobal()
+    {
+        using var db = new ApplicationDbContext();
+
+        SetUp();
+
+        var departamentos = db.Departamentos.IgnoreQueryFilters().Where(departamento => departamento.Id > 0).ToList();
+
+
+        foreach (var departamento in departamentos)
         {
-            using var db = new ApplicationDbContext();
-            SetUpTiposCarregamentos(db);
-
-            var dapartamentos = db
-                .Departamentos
-                .Include(deparamento => deparamento.Funcionarios);
-
-            foreach (var departamento in dapartamentos)
-            {
-                Console.WriteLine($"-------------------------------------");
-                Console.WriteLine($"Departamento: {departamento.Descricao}");
-
-                if (departamento.Funcionarios.Any())
-                {
-                    foreach (var funcionario in departamento.Funcionarios)
-                    {
-                        Console.WriteLine($"-------------------------------------");
-                        Console.WriteLine($"Funcionario: {funcionario.Nome}");
-                    }
-                }
-                else
-                {
-                    Console.WriteLine("Nenhum Funcionario");
-                }
-            }
+            Console.WriteLine($"Departamento descrição: {departamento.Descricao} \t Excluido {departamento.Excluido}");
         }
-        public static void SetUpTiposCarregamentos(ApplicationDbContext db)
+    }
+    public static void FiltroGlobal()
+    {
+        using var db = new ApplicationDbContext();
+
+        SetUp();
+
+        var departamentos = db.Departamentos.Where(departamento => departamento.Id > 0).ToList();
+
+
+        foreach (var departamento in departamentos)
         {
-            if (!db.Departamentos.Any())
-            {
-                db.Departamentos.AddRange(
-                    new Domain.Departamento()
+            Console.WriteLine($"Departamento descrição: {departamento.Descricao} \t Excluido {departamento.Excluido}");
+        }
+    }
+    public static void SetUp()
+    {
+        using var db = new ApplicationDbContext();
+
+        if (db.Database.EnsureCreated())
+        {
+            db.Departamentos.AddRange(
+                new Domain.Departamento()
+                {
+                    Ativo = true,
+                    Descricao = "Departamento 01",
+                    Funcionarios = new List<Domain.Funcionario>()
                     {
-                        Descricao = "Departamento 01",
-                        Funcionarios = new List<Domain.Funcionario>()
-                        {
                             new Domain.Funcionario()
                             {
                                 Nome = "Guilherme",
                                 RG = "99384758",
                                 CPF = "93847583902"
                             }
-                        }
                     },
-                    new Domain.Departamento()
+                    Excluido = true
+                },
+                new Domain.Departamento()
+                {
+                    Ativo = true,
+                    Descricao = "Departamento 02",
+                    Funcionarios = new List<Domain.Funcionario>()
                     {
-                        Descricao = "Departamento 02",
-                        Funcionarios = new List<Domain.Funcionario>()
-                        {
                             new Domain.Funcionario()
                             {
                                 Nome = "Santos",
@@ -191,192 +178,12 @@ namespace EFCoreAvancado
                                 RG = "50487654",
                                 CPF = "55525643421"
                             }
-                        }
                     }
-                );
-
-                db.SaveChanges();
-                db.ChangeTracker.Clear();
-            }
-        }
-        public static void ScriptGeralDoBancoDeDados()
-        {
-
-            using var db = new ApplicationDbContext();
-
-            var script = db.Database.GenerateCreateScript();
-
-            Console.WriteLine(script);
-
-        }
-        public static void MigracoesAplicadas()
-        {
-            using var db = new ApplicationDbContext();
-
-            var migracoes = db.Database.GetAppliedMigrations();
-
-            Console.WriteLine($"Migrações = {migracoes.Count()}");
-
-            foreach (var migracao in migracoes)
-            {
-                Console.WriteLine($"Migracao: {migracao}");
-            }
-        }
-
-        public static void TodasMigracoes()
-        {
-            using var db = new ApplicationDbContext();
-
-            var migracoes = db.Database.GetMigrations();
-
-            Console.WriteLine($"Migrações = {migracoes.Count()}");
-
-            foreach (var migracao in migracoes)
-            {
-                Console.WriteLine($"Migracao: {migracao}");
-            }
-        }
-
-        public static void AplicarMigracaoEmTempoExecucao()
-        {
-            using var db = new ApplicationDbContext();
-
-            db.Database.Migrate();
-        }
-
-        public static void MigracaoesPendentes()
-        {
-            using var db = new ApplicationDbContext();
-
-            IEnumerable<string> migracaoesPendentes = db.Database.GetPendingMigrations();
-
-            Console.WriteLine($"Migrações = {migracaoesPendentes.Count()}");
-
-            foreach (var migracao in migracaoesPendentes)
-            {
-                Console.WriteLine($"Migracao: {migracao}");
-            }
-
-        }
-
-        // nunca aceite concatenação sempre argumentos no metodo somente
-        public static void SqlInjection()
-        {
-            using var db = new ApplicationDbContext();
-
-            db.Database.EnsureDeleted();
-            db.Database.EnsureCreated();
-
-            db.Departamentos.AddRange(
-                new Domain.Departamento
-                {
-                    Descricao = "Departamento  2"
-                },
-                new Domain.Departamento
-                {
-                    Descricao = "Departamento 3"
                 }
             );
-
-            db.SaveChanges();
-
-
-            var descricao = "Teste' or 1='1";                                                                         // 'Teste' or 1='1'
-            db.Database.ExecuteSqlRaw($"update Departamentos set descricao='Depaartamento Alterado' where descricao = '{descricao}'");
-
-            foreach (var departamento in db.Departamentos.AsNoTracking())
-            {
-                Console.WriteLine($"Id: {departamento.Id}, Descricao: {departamento.Descricao}");
-            }
         }
 
-        public static void ExecuteSql()
-        {
-            using var db = new ApplicationDbContext();
+        db.SaveChanges();
 
-            // Primeira opção
-            using (var cmd = db.Database.GetDbConnection().CreateCommand())
-            {
-                cmd.CommandText = "SELECT 1";
-                cmd.ExecuteNonQuery();
-            }
-            // segunda opcao - transforma os argumentos em dbParam
-            var descricao = "Teste";
-            db.Database.ExecuteSqlRaw("update departamentos set descricao={0} where id=1", descricao);
-
-            //terceira opção 
-            db.Database.ExecuteSqlInterpolated($"update departamentos set descricao={descricao} where id=1");
-        }
-
-        // gerenciamos manualmente a conexão com banco de dados para garantir performance
-        public static void GerenciarEstadoDaConexao(bool gerenciarEstadoConexao = false)
-        {
-
-            using var db = new ApplicationDbContext();
-            var time = System.Diagnostics.Stopwatch.StartNew();
-
-            var connection = db.Database.GetDbConnection();
-
-            connection.StateChange += (_, __) => ++_contador;
-
-            if (gerenciarEstadoConexao)
-            {
-                connection.Open();
-            }
-
-            for (int i = 0; i < 200; i++)
-            {
-                db.Departamentos.AsNoTracking().Any();
-            }
-
-            time.Stop();
-
-            string message = $"Tempo: {time.Elapsed.ToString()}, gerenciarEstadoConexao: {gerenciarEstadoConexao}, Contador: {_contador}";
-
-            Console.WriteLine(message);
-        }
-
-        // verificamos se podemos conectar
-        public static void HealthCheckDatabase()
-        {
-            using var db = new ApplicationDbContext();
-
-            var canConnect = db.Database.CanConnect();
-
-            if (canConnect)
-            {
-                Console.WriteLine("Pode conectar");
-            }
-            else
-            {
-                Console.WriteLine("Não pode conectar");
-            }
-        }
-
-        // criar e deletar um banco de dados sem utilizar migrations
-        public static void EnsureCreatedAndDeleted()
-        {
-            using var db = new ApplicationDbContext();
-
-            // db.Database.EnsureCreated();
-            // db.Database.EnsureDeleted();
-        }
-
-        // solução do problema de utilizar 2 contextos com EnsureCreated()
-        public static void GapDoEnsureCreated()
-        {
-            using var db1 = new ApplicationDbContext();
-            using var db2 = new ApplicationDbContextCidade();
-
-            db1.Database.EnsureCreated();
-            db2.Database.EnsureCreated();
-
-
-            // Forçamos a criação das tabelas do segundo contexto do banco de dados 
-            var databaseCreator = db2.GetService<IRelationalDatabaseCreator>();
-
-
-            databaseCreator.CreateTables();
-        }
     }
 }
