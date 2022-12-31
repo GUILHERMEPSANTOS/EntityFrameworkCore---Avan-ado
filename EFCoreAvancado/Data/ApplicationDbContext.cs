@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using EFCoreAvancado.Domain;
 using Microsoft.EntityFrameworkCore;
 
@@ -17,7 +13,8 @@ namespace EFCoreAvancado.Data
             const string strConnection = "Data Source=.;Initial Catalog=EFAvancado2;Integrated Security=True;Encrypt=false;pooling=true";
 
             optionsBuilder
-                .UseSqlServer(strConnection)
+                .UseSqlServer(strConnection,
+                        options => options.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery))
                 .EnableSensitiveDataLogging()
             .LogTo(Console.WriteLine);
         }
@@ -26,7 +23,6 @@ namespace EFCoreAvancado.Data
         {
             builder
                 .ApplyConfigurationsFromAssembly(typeof(ApplicationDbContext).Assembly);
-            // .Entity<Departamento>().HasQueryFilter(departamento => !departamento.Excluido);
         }
     }
 }

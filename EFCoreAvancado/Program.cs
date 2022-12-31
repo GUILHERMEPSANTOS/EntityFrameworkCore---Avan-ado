@@ -1,4 +1,5 @@
 using EFCoreAvancado.Data;
+using EFCoreAvancado.Domain;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 
@@ -14,9 +15,73 @@ public class Program
         // ConsultaProjetada();
         // ConsultaParametrizada();
         // ConsultaInterpolada();
-        ConsultaComTag();
+        // ConsultaComTag();
+        // Consulta1N();
+        // ConsultaN1();
+        // DivisaoDeConsultas();
     }
 
+    public static void DivisaoDeConsultas()
+    {
+        using var db = new ApplicationDbContext();
+
+        SetUp();
+
+        var departamentos = db.Set<Departamento>()
+            .Where(departamento => !departamento.Excluido)
+            .Include(departamento => departamento.Funcionarios)
+            //.AsSplitQuery()
+            .AsSingleQuery()
+            .ToList();
+
+        foreach (var departamento in departamentos)
+        {
+            Console.WriteLine($"Departamento descrição: {departamento.Descricao}");
+
+            foreach (var funcionario in departamento.Funcionarios)
+            {
+                Console.WriteLine($"\t Funcionario Nome: {funcionario.Nome}, Departamento: {funcionario.Departamento}");
+            }
+        }
+    }
+
+    public static void ConsultaN1()
+    {
+        using var db = new ApplicationDbContext();
+
+        SetUp();
+
+        var funcionarios = db.Funcionarios
+            .Include(departamento => departamento.Departamento)
+            .ToList();
+
+        foreach (var funcionario in funcionarios)
+        {
+            Console.WriteLine($"\t Funcionario Nome: {funcionario.Nome}, Departamento: {funcionario.Departamento.Descricao}");
+        }
+    }
+
+    public static void Consulta1N()
+    {
+        using var db = new ApplicationDbContext();
+
+        SetUp();
+
+        var departamentos = db.Set<Departamento>()
+            .Where(departamento => !departamento.Excluido)
+            .Include(departamento => departamento.Funcionarios)
+            .ToList();
+
+        foreach (var departamento in departamentos)
+        {
+            Console.WriteLine($"Departamento descrição: {departamento.Descricao}");
+
+            foreach (var funcionario in departamento.Funcionarios)
+            {
+                Console.WriteLine($"\t Funcionario Nome: {funcionario.Nome}, Departamento: {funcionario.Departamento}");
+            }
+        }
+    }
 
     public static void ConsultaComTag()
     {
@@ -36,6 +101,7 @@ public class Program
             Console.WriteLine($"Departamento descrição: {departamento.Descricao}");
         }
     }
+
     public static void ConsultaInterpolada()
     {
         using var db = new ApplicationDbContext();
@@ -56,7 +122,6 @@ public class Program
         }
     }
 
-
     public static void ConsultaParametrizada()
     {
         using var db = new ApplicationDbContext();
@@ -75,7 +140,6 @@ public class Program
                 .FromSqlRaw("SELECT * FROM Departamentos WITH(NOLOCK) WHERE ID > {0}", id)
                 .Where(departamento => !departamento.Excluido)
                 .ToList();
-
 
         foreach (var departamento in departamentos)
         {
@@ -184,6 +248,5 @@ public class Program
         }
 
         db.SaveChanges();
-
     }
 }
