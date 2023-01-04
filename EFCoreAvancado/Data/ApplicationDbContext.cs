@@ -16,17 +16,17 @@ namespace EFCoreAvancado.Data
             const string strConnection = "Data Source=.;Initial Catalog=EFAvancado2;Integrated Security=True;Encrypt=false;pooling=true";
 
             optionsBuilder
-                .UseSqlServer(strConnection)
-                // .LogTo(Console.WriteLine, LogLevel.Information);
-                //  .LogTo(
-                //     Console.WriteLine,
-                //     new[] { CoreEventId.ContextInitialized, RelationalEventId.CommandExecuted },
-                //     LogLevel.Information,
-                //     options: DbContextLoggerOptions.LocalTime | DbContextLoggerOptions.Id
-                //  );
-                // .LogTo(_writer.WriteLine, LogLevel.Information);
-                .EnableDetailedErrors();
-                
+                .UseSqlServer(strConnection, options => options.MaxBatchSize(20))
+                .LogTo(Console.WriteLine, LogLevel.Information);
+            //  .LogTo(
+            //     Console.WriteLine,
+            //     new[] { CoreEventId.ContextInitialized, RelationalEventId.CommandExecuted },
+            //     LogLevel.Information,
+            //     options: DbContextLoggerOptions.LocalTime | DbContextLoggerOptions.Id
+            //  );
+            // .LogTo(_writer.WriteLine, LogLevel.Information);
+            // .EnableDetailedErrors();
+
         }
 
         protected override void OnModelCreating(ModelBuilder builder)
@@ -37,7 +37,7 @@ namespace EFCoreAvancado.Data
         public override void Dispose()
         {
             base.Dispose();
-            
+
             _writer.Dispose();
         }
     }
