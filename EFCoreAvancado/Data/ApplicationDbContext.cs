@@ -16,7 +16,12 @@ namespace EFCoreAvancado.Data
             const string strConnection = "Data Source=.;Initial Catalog=EFAvancado2;Integrated Security=True;Encrypt=false;pooling=true";
 
             optionsBuilder
-                .UseSqlServer(strConnection, options => options.MaxBatchSize(20).CommandTimeout(5))
+                .UseSqlServer(
+                    strConnection,
+                    options => options
+                                    .MaxBatchSize(20)
+                                    .CommandTimeout(5)
+                                    .EnableRetryOnFailure(4, TimeSpan.FromSeconds(10), null))
                 .LogTo(Console.WriteLine, LogLevel.Information);
             //  .LogTo(
             //     Console.WriteLine,
@@ -28,8 +33,8 @@ namespace EFCoreAvancado.Data
             // .EnableDetailedErrors();
 
         }
-        
-        
+
+
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
