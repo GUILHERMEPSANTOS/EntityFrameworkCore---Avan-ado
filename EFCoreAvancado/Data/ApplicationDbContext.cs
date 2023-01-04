@@ -24,7 +24,9 @@ namespace EFCoreAvancado.Data
                 //     LogLevel.Information,
                 //     options: DbContextLoggerOptions.LocalTime | DbContextLoggerOptions.Id
                 //  );
-                .LogTo(_writer.WriteLine, LogLevel.Information);
+                // .LogTo(_writer.WriteLine, LogLevel.Information);
+                .EnableDetailedErrors();
+                
         }
 
         protected override void OnModelCreating(ModelBuilder builder)
