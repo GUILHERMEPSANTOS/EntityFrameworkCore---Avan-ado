@@ -12,10 +12,21 @@ public class Program
 
         // ConsultarDepartamentos();
         // HabilitandoBatchSize();
-        TempoComandoGeral();
+        // TempoComandoGeralGlobal();
+        TempoComandoParaFluxo();
     }
 
-    static void TempoComandoGeral()
+    static void TempoComandoParaFluxo()
+    {
+        using var db = new ApplicationDbContext();
+
+        db.Database.SetCommandTimeout(10);
+
+        db.Database.ExecuteSqlRaw("WAITFOR DELAY '00:00:07'; SELECT 1");
+
+    }
+
+    static void TempoComandoGeralGlobal()
     {
         using var db = new ApplicationDbContext();
 
