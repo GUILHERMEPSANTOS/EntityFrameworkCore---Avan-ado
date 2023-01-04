@@ -1,0 +1,61 @@
+dbug: 04/01/2023 13:11:33.532 CoreEventId.ContextInitialized[10403] (Microsoft.EntityFrameworkCore.Infrastructure) 
+      Entity Framework Core 7.0.1 initialized 'ApplicationDbContext' using provider 'Microsoft.EntityFrameworkCore.SqlServer:7.0.1' with options: None
+dbug: 04/01/2023 13:11:33.604 CoreEventId.QueryCompilationStarting[10111] (Microsoft.EntityFrameworkCore.Query) 
+      Compiling query expression: 
+      'DbSet<Departamento>()
+          .Where(departamento => departamento.Id > 0)'
+dbug: 04/01/2023 13:11:33.816 CoreEventId.QueryExecutionPlanned[10107] (Microsoft.EntityFrameworkCore.Query) 
+      Generated query execution expression: 
+      'queryContext => new SingleQueryingEnumerable<Departamento>(
+          (RelationalQueryContext)queryContext, 
+          RelationalCommandCache.QueryExpression(
+              Projection Mapping:
+                  EmptyProjectionMember -> Dictionary<IProperty, int> { [Property: Departamento.Id (int) Required PK AfterSave:Throw ValueGenerated.OnAdd, 0], [Property: Departamento.Ativo (bool) Required, 1], [Property: Departamento.Descricao (string) Required MaxLength(512), 2], [Property: Departamento.Excluido (bool) Required, 3] }
+              SELECT d.Id, d.Ativo, d.Descricao, d.Excluido
+              FROM Departamentos AS d
+              WHERE d.Id > 0), 
+          null, 
+          Func<QueryContext, DbDataReader, ResultContext, SingleQueryResultCoordinator, Departamento>, 
+          EFCoreAvancado.Data.ApplicationDbContext, 
+          False, 
+          False, 
+          True
+      )'
+dbug: 04/01/2023 13:11:33.848 RelationalEventId.ConnectionCreating[20005] (Microsoft.EntityFrameworkCore.Database.Connection) 
+      Creating DbConnection.
+dbug: 04/01/2023 13:11:33.873 RelationalEventId.ConnectionCreated[20006] (Microsoft.EntityFrameworkCore.Database.Connection) 
+      Created DbConnection. (25ms).
+dbug: 04/01/2023 13:11:33.873 RelationalEventId.CommandCreating[20103] (Microsoft.EntityFrameworkCore.Database.Command) 
+      Creating DbCommand for 'ExecuteReader'.
+dbug: 04/01/2023 13:11:33.878 RelationalEventId.CommandCreated[20104] (Microsoft.EntityFrameworkCore.Database.Command) 
+      Created DbCommand for 'ExecuteReader' (32ms).
+dbug: 04/01/2023 13:11:33.880 RelationalEventId.CommandInitialized[20106] (Microsoft.EntityFrameworkCore.Database.Command) 
+      Initialized DbCommand for 'ExecuteReader' (35ms).
+dbug: 04/01/2023 13:11:33.883 RelationalEventId.ConnectionOpening[20000] (Microsoft.EntityFrameworkCore.Database.Connection) 
+      Opening connection to database 'EFAvancado2' on server '.'.
+dbug: 04/01/2023 13:11:34.250 RelationalEventId.ConnectionOpened[20001] (Microsoft.EntityFrameworkCore.Database.Connection) 
+      Opened connection to database 'EFAvancado2' on server '.'.
+dbug: 04/01/2023 13:11:34.254 RelationalEventId.CommandExecuting[20100] (Microsoft.EntityFrameworkCore.Database.Command) 
+      Executing DbCommand [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [d].[Id], [d].[Ativo], [d].[Descricao], [d].[Excluido]
+      FROM [Departamentos] AS [d]
+      WHERE [d].[Id] > 0
+info: 04/01/2023 13:11:34.277 RelationalEventId.CommandExecuted[20101] (Microsoft.EntityFrameworkCore.Database.Command) 
+      Executed DbCommand (24ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [d].[Id], [d].[Ativo], [d].[Descricao], [d].[Excluido]
+      FROM [Departamentos] AS [d]
+      WHERE [d].[Id] > 0
+dbug: 04/01/2023 13:11:34.310 CoreEventId.StartedTracking[10806] (Microsoft.EntityFrameworkCore.ChangeTracking) 
+      Context 'ApplicationDbContext' started tracking 'Departamento' entity. Consider using 'DbContextOptionsBuilder.EnableSensitiveDataLogging' to see key values.
+dbug: 04/01/2023 13:11:34.326 CoreEventId.StartedTracking[10806] (Microsoft.EntityFrameworkCore.ChangeTracking) 
+      Context 'ApplicationDbContext' started tracking 'Departamento' entity. Consider using 'DbContextOptionsBuilder.EnableSensitiveDataLogging' to see key values.
+dbug: 04/01/2023 13:11:34.326 CoreEventId.Starteinfo: 04/01/2023 13:19:09.149 RelationalEventId.CommandExecuted[20101] (Microsoft.EntityFrameworkCore.Database.Command) 
+      Executed DbCommand (23ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [d].[Id], [d].[Ativo], [d].[Descricao], [d].[Excluido]
+      FROM [Departamentos] AS [d]
+      WHERE [d].[Id] > 0
+info: 04/01/2023 13:19:22.816 RelationalEventId.CommandExecuted[20101] (Microsoft.EntityFrameworkCore.Database.Command) 
+      Executed DbCommand (26ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [d].[Id], [d].[Ativo], [d].[Descricao], [d].[Excluido]
+      FROM [Departamentos] AS [d]
+      WHERE [d].[Id] > 0

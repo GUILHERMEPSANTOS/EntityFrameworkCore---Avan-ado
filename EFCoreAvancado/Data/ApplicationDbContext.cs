@@ -7,6 +7,7 @@ namespace EFCoreAvancado.Data
 {
     public class ApplicationDbContext : DbContext
     {
+        private readonly StreamWriter _writer = new StreamWriter("log_ef_core.txt", append: true);
         public DbSet<Departamento> Departamentos { get; set; }
         public DbSet<Funcionario> Funcionarios { get; set; }
 
@@ -16,19 +17,26 @@ namespace EFCoreAvancado.Data
 
             optionsBuilder
                 .UseSqlServer(strConnection)
-                 // .LogTo(Console.WriteLine, LogLevel.Information);
-                 .LogTo(
-                    Console.WriteLine,
-                    new[] { CoreEventId.ContextInitialized, RelationalEventId.CommandExecuted },
-                    LogLevel.Information,
-                    options: DbContextLoggerOptions.LocalTime | DbContextLoggerOptions.Id
-                 );
-
+                // .LogTo(Console.WriteLine, LogLevel.Information);
+                //  .LogTo(
+                //     Console.WriteLine,
+                //     new[] { CoreEventId.ContextInitialized, RelationalEventId.CommandExecuted },
+                //     LogLevel.Information,
+                //     options: DbContextLoggerOptions.LocalTime | DbContextLoggerOptions.Id
+                //  );
+                .LogTo(_writer.WriteLine, LogLevel.Information);
         }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
             builder.ApplyConfigurationsFromAssembly(typeof(ApplicationDbContext).Assembly);
+        }
+
+        public override void Dispose()
+        {
+            base.Dispose();
+            
+            _writer.Dispose();
         }
     }
 }
