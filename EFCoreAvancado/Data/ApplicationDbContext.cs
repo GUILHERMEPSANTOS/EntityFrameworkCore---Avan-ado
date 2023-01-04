@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using EFCoreAvancado.Domain;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace EFCoreAvancado.Data
 {
@@ -14,13 +15,12 @@ namespace EFCoreAvancado.Data
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            const string strConnection = "Data Source=.;Initial Catalog=EFAvancado;Integrated Security=True;Encrypt=false;pooling=true"; 
+            const string strConnection = "Data Source=.;Initial Catalog=EFAvancado2;Integrated Security=True;Encrypt=false;pooling=true"; 
 
             optionsBuilder
-                .EnableSensitiveDataLogging()
-                // .LogTo(Console.WriteLine)
-                // .UseLazyLoadingProxies()
-                .UseSqlServer(strConnection);
+                .UseSqlServer(strConnection)
+                // .LogTo(Console.WriteLine, LogLevel.Information);
+                
         }
 
         protected override void OnModelCreating(ModelBuilder builder)
