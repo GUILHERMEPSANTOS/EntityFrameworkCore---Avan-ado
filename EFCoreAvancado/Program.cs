@@ -9,9 +9,18 @@ public class Program
     static int _contador;
     public static void Main()
     {
-        _contador = 0;
+
         // ConsultarDepartamentos();
-        HabilitandoBatchSize();
+        // HabilitandoBatchSize();
+        TempoComandoGeral();
+    }
+
+    static void TempoComandoGeral()
+    {
+        using var db = new ApplicationDbContext();
+
+        db.Database.ExecuteSqlRaw("WAITFOR DELAY '00:00:07'; SELECT 1");
+
     }
 
     static void HabilitandoBatchSize()
@@ -21,7 +30,7 @@ public class Program
         db.Database.EnsureDeleted();
         db.Database.EnsureCreated();
 
-        db.Database.GetDbConnection().StateChange += (_, __) => ++ _contador;
+        db.Database.GetDbConnection().StateChange += (_, __) => ++_contador;
 
         for (int i = 0; i < 50; i++)
         {
