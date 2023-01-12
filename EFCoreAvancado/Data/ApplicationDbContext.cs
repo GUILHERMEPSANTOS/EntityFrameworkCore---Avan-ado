@@ -7,7 +7,6 @@ namespace EFCoreAvancado.Data
 {
     public class ApplicationDbContext : DbContext
     {
-        private readonly StreamWriter _writer = new StreamWriter("log_ef_core.txt", append: true);
         public DbSet<Departamento> Departamentos { get; set; }
         public DbSet<Funcionario> Funcionarios { get; set; }
 
