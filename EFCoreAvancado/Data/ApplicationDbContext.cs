@@ -26,12 +26,5 @@ namespace EFCoreAvancado.Data
         {
             builder.ApplyConfigurationsFromAssembly(typeof(ApplicationDbContext).Assembly);
         }
-
-        public override void Dispose()
-        {
-            base.Dispose();
-
-            _writer.Dispose();
-        }
     }
 }
