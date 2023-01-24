@@ -55,12 +55,16 @@ namespace EFCoreAvancado.Data
                 .IsUnique();
              */
 
+            // builder.Entity<Estado>()
+            //     .HasData(
+            //         new[] {
+            //              new Estado { Id = 1, Nome = "São Paulo" },
+            //              new Estado { Id = 2, Nome = "Sergipe" }
+            //     });
+
+            builder.HasDefaultSchema("cadastros");
             builder.Entity<Estado>()
-                .HasData(
-                    new[] {
-                         new Estado { Id = 1, Nome = "São Paulo" },
-                         new Estado { Id = 2, Nome = "Sergipe" }
-                });
+                .ToTable("Estados","Segundo Esquema");
         }
     }
 }

@@ -6,7 +6,7 @@ public class Program
 {
     public static void Main()
     {
-        PropagacaoDados();
+        Esquema();
     }
 
     public static void Collations()
@@ -23,6 +23,14 @@ public class Program
         db.Database.EnsureDeleted();
         db.Database.EnsureCreated();
 
+
+        var script = db.Database.GenerateCreateScript();
+
+        System.Console.WriteLine(script);
+    }
+    public static void Esquema()
+    {
+        using var db = new ApplicationDbContext();
 
         var script = db.Database.GenerateCreateScript();
 
