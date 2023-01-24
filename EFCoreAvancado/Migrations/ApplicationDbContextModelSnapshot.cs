@@ -16,6 +16,7 @@ namespace EFCoreAvancado.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
+                .UseCollation("SQL_Latin_General_CP1_CI_AI")
                 .HasAnnotation("ProductVersion", "7.0.1")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
@@ -35,7 +36,11 @@ namespace EFCoreAvancado.Migrations
                     b.Property<string>("Descricao")
                         .IsRequired()
                         .HasMaxLength(512)
-                        .HasColumnType("nvarchar(512)");
+                        .HasColumnType("nvarchar(512)")
+                        .UseCollation("SQL_Latin_General_CP1_CI_AI");
+
+                    b.Property<bool>("Excluido")
+                        .HasColumnType("bit");
 
                     b.HasKey("Id");
 
@@ -56,6 +61,9 @@ namespace EFCoreAvancado.Migrations
 
                     b.Property<int>("DepartamentoId")
                         .HasColumnType("int");
+
+                    b.Property<bool>("Excluido")
+                        .HasColumnType("bit");
 
                     b.Property<string>("Nome")
                         .IsRequired()

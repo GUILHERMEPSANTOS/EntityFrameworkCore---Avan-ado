@@ -11,14 +11,15 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EFCoreAvancado.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20221219165518_Rg")]
-    partial class Rg
+    [Migration("20230112162837_Initial")]
+    partial class Initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
+                .UseCollation("SQL_Latin_General_CP1_CI_AI")
                 .HasAnnotation("ProductVersion", "7.0.1")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
@@ -38,7 +39,11 @@ namespace EFCoreAvancado.Migrations
                     b.Property<string>("Descricao")
                         .IsRequired()
                         .HasMaxLength(512)
-                        .HasColumnType("nvarchar(512)");
+                        .HasColumnType("nvarchar(512)")
+                        .UseCollation("SQL_Latin_General_CP1_CI_AI");
+
+                    b.Property<bool>("Excluido")
+                        .HasColumnType("bit");
 
                     b.HasKey("Id");
 
@@ -59,6 +64,9 @@ namespace EFCoreAvancado.Migrations
 
                     b.Property<int>("DepartamentoId")
                         .HasColumnType("int");
+
+                    b.Property<bool>("Excluido")
+                        .HasColumnType("bit");
 
                     b.Property<string>("Nome")
                         .IsRequired()

@@ -16,8 +16,9 @@ namespace EFCoreAvancado.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Descricao = table.Column<string>(type: "nvarchar(512)", maxLength: 512, nullable: false),
-                    Ativo = table.Column<bool>(type: "bit", nullable: false)
+                    Descricao = table.Column<string>(type: "nvarchar(512)", maxLength: 512, nullable: false, collation: "SQL_Latin_General_CP1_CI_AI"),
+                    Ativo = table.Column<bool>(type: "bit", nullable: false),
+                    Excluido = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -32,6 +33,8 @@ namespace EFCoreAvancado.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Nome = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     CPF = table.Column<string>(type: "CHAR(11)", nullable: false),
+                    RG = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Excluido = table.Column<bool>(type: "bit", nullable: false),
                     DepartamentoId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
