@@ -9,6 +9,8 @@ namespace EFCoreAvancado.Data
     {
         public DbSet<Departamento> Departamentos { get; set; }
         public DbSet<Funcionario> Funcionarios { get; set; }
+        public DbSet<Estado> Estados { get; set; }
+
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -43,10 +45,22 @@ namespace EFCoreAvancado.Data
                 .HasMin(1)
                 .HasMax(10)
                 .IsCyclic();
+             
+             -- indice 
+             builder.Entity<Departamento>()
+                .HasIndex(p => new { p.Descricao, p.Ativo })
+                .HasDatabaseName("idx_meu_indice_composto")
+                .HasFilter("Descricao is not null")
+                .HasFillFactor(80)
+                .IsUnique();
              */
 
-             builder.Entity<Departamento>()
-                .HasIndex(p => new { p.Descricao, p.Ativo });
+            builder.Entity<Estado>()
+                .HasData(
+                    new[] {
+                         new Estado { Id = 1, Nome = "São Paulo" },
+                         new Estado { Id = 2, Nome = "Sergipe" }
+                });
         }
     }
 }
